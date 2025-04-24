@@ -1,8 +1,27 @@
 const { limiter, generateRandomIndex, parseQueryTags, parseAttribution } = require('./utils');
-const { startServer } = require("./network");
+const { connectToDB, getDB } = require("./database-connection");
 const express = require('express');
 const app = express();
+require('dotenv').config();
+let db;
 
+
+const startServer = async () => {
+    try 
+    {
+        await connectToDB();
+        db = getDB();
+        const port = process.env.PORT || 3000;
+        app.listen(port, () => console.log(`Listerning on Port ${port}`))
+    }
+    catch (error) 
+    {
+        console.log('Failed to start: ', error);
+        process.exit(1);
+    }
+  }
+
+startServer();  
 
 // Middleware
 app.use(limiter);

@@ -2,7 +2,6 @@ const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
 const uri = process.env.DB_CONNECTION_STRING;
-const port = process.env.PORT || 3000;
 const client = new MongoClient(uri);
 let _db;
 
@@ -29,18 +28,4 @@ function getDB() {
 }
 
 
-const startServer = async () => {
-  try 
-  {
-      await connectToDB();
-      const db = getDB();
-      app.listen(port, () => console.log(`Listening on Port ${port}`))
-  }
-  catch (error) 
-  {
-      console.log('Failed to connect to database: ', error);
-      process.exit(1);
-  }
-}
-
-module.exports = { startServer };
+module.exports = { connectToDB, getDB };
