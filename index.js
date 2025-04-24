@@ -9,23 +9,22 @@ app.use(limiter);
 app.use(express.json());
 
 
-
 // Endpoints 
 app.get('/quote-by-id/:ID', async (req, res) => {
-        const { ID } = req.params;
-        if (!ID) { 
-            return res.status(400).send({ message: "ID parameter is required."});
-        }
+    const { ID } = req.params;
+    if (!ID) { 
+        return res.status(400).send({ message: "ID parameter is required."});
+    }
 
-        const quote = await db.collection('Quotes').findOne({id:ID});
+    const quote = await db.collection('Quotes').findOne({id:ID});
 
-        if (!quote) {
-            res.status(404).send({ message: "Quote not found." })
-            return;
-        }
-        else {
-            res.status(200).send(quote);          
-        }
+    if (!quote) {
+        res.status(404).send({ message: "Quote not found." })
+        return;
+    }
+    else {
+        res.status(200).send(quote);          
+    }
 })
 
 app.get('/quote', async (req, res) => {
