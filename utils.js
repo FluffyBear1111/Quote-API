@@ -17,12 +17,11 @@ const parseQueryTags = (tags) => {
 };
 
 const parseAttribution = (attribution) => {
-    if (attribution !== '') {
-        return attribution;
+    if (!attribution || attribution.trim() === '') {
+        return null;
     }
-    else return null;
+    return attribution.trim();
 }
 
 module.exports = { limiter, generateRandomIndex, parseQueryTags, parseAttribution };
 
-                

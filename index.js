@@ -12,11 +12,11 @@ const startServer = async () => {
         await connectToDB();
         db = getDB();
         const port = process.env.PORT || 3000;
-        app.listen(port, () => console.log(`Listerning on Port ${port}`))
+        app.listen(port, () => console.log(`Listening on Port ${port}`))
     }
     catch (error) 
     {
-        console.log('Failed to start: ', error);
+        console.error('Failed to start: ', error);
         process.exit(1);
     }
   }
@@ -30,19 +30,23 @@ app.use(express.json());
 
 // Endpoints 
 app.get('/quote-by-id/:ID', async (req, res) => {
-    const { ID } = req.params;
-    if (!ID) { 
-        return res.status(400).send({ message: "ID parameter is required."});
-    }
-
-    const quote = await db.collection('Quotes').findOne({id:ID});
-
-    if (!quote) {
-        res.status(404).send({ message: "Quote not found." })
-        return;
-    }
-    else {
-        res.status(200).send(quote);          
+    try 
+    {
+        const { ID } = req.params;
+        if (!ID) { 
+            return res.status(400).send({ message: "ID parameter is required."});
+        }
+    
+        const quote = await db.collection('Quotes').findOne({id:ID});
+    
+        if (!quote) {
+            res.status(404).send({ message: "Quote not found." })
+            return;
+        }
+        else res.status(200).send(quote);          
+    } 
+    catch (error) {
+        return res.status(500).send({ message: "Something went wrong on server end.", error: error.message })
     }
 })
 
