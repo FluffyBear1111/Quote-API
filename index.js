@@ -11,9 +11,12 @@ function generateRandomIndex(arrayLength) {
     return Math.floor(Math.random() * arrayLength);
 }
 
+
 app.use(express.json());
 
 app.listen(PORT, () => console.log("Listening on http://localhost:8080"))
+
+
 
 app.get('/quote/:ID', async (req, res) => {
         const { ID } = req.params;
@@ -24,8 +27,7 @@ app.get('/quote/:ID', async (req, res) => {
         else {
             res.status(200).send(quote);
         }
-    }
-)
+})
 
 app.get('/random-quote', async (req, res) => {
     const { tags, attribution } = req.query;
@@ -37,7 +39,7 @@ app.get('/random-quote', async (req, res) => {
         query.tags = { $in: queryTags};
     }
     if (queryAttribution) {
-        query.attribution = { $regex: attribution, $options: 'i' };
+        query.attribution = { $regex: queryAttribution, $options: 'i' };
     }
 
     try {
@@ -52,9 +54,6 @@ app.get('/random-quote', async (req, res) => {
     catch (error) {
         res.status(500).send({ message: "Something went wrong on server end."})
     }
-
-
-
 })
 
 app.get('/random-devChoice', async (req, res) => {
@@ -66,6 +65,34 @@ app.get('/random-devChoice', async (req, res) => {
     } 
     catch (error) {
         res.status(500).send({message: "Something went wrong on server end."})
+    }
+})
+
+app.get('/devChoice', async (req, res) => {
+    const { tags, attribution } = req.query;
+    const queryTags = tags?.split('+').filter(tag => tag.trim() !== '') || null;
+    const queryAttribution = attribution !== '' ? attribution : null;
+    const query = {};
+
+    if (queryAttribution) {
+        query.attribution = { $regex: queryAttribution, $options: 'i'};
+    }
+
+    if (queryTags) {
+        query.tags = { $in: queryTags};
+    }
+
+    try {
+        const quotes = await db.collection('Quotes').find(query).toArray();
+        if (quotes.length === 0) {
+            res.status(404).send({ message: "No quotes found for given tags and/or attribution."})
+        }
+        const randomIndex = generateRandomIndex(quotes.length);
+        res.status(200).send(quotes[randomIndex]);
+    }
+
+    catch (error) {
+        res.status(500).send("Something went wrong on server end.");
     }
 })
 
