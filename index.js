@@ -18,7 +18,7 @@ app.listen(PORT, () => console.log("Listening on http://localhost:8080"))
 
 
 
-app.get('/quote/:ID', async (req, res) => {
+app.get('/quote-by-id/:ID', async (req, res) => {
         const { ID } = req.params;
         const quote = await db.collection('Quotes').findOne({id:ID});
         if (!quote) {
@@ -29,9 +29,9 @@ app.get('/quote/:ID', async (req, res) => {
         }
 })
 
-app.get('/random-quote', async (req, res) => {
+app.get('/quote', async (req, res) => {
     const { tags, attribution } = req.query;
-    const queryTags = tags?.split('+').filter(tag => tag.trim() !== '') || null;
+    const queryTags = tags && tags !== '' ? tags.split('+').filter(tag => tag.trim() !== '') : null;
     const queryAttribution = attribution || null;
     const query = {}
 
@@ -56,23 +56,12 @@ app.get('/random-quote', async (req, res) => {
     }
 })
 
-app.get('/random-devChoice', async (req, res) => {
-    try {
-        const quotes = await db.collection('Quotes').find({ devChoice: true }).toArray()
-        const randomIndex = generateRandomIndex(quotes.length);
-        const response = quotes[randomIndex];
-        res.status(200).send(response); 
-    } 
-    catch (error) {
-        res.status(500).send({message: "Something went wrong on server end."})
-    }
-})
-
-app.get('/devChoice', async (req, res) => {
+app.get('/quote-devChoice', async (req, res) => {
     const { tags, attribution } = req.query;
-    const queryTags = tags?.split('+').filter(tag => tag.trim() !== '') || null;
+    const queryTags = tags && tags !== '' ? tags.split('+').filter(tag => tag.trim() !== '') : null;
     const queryAttribution = attribution !== '' ? attribution : null;
     const query = {};
+    query.devChoice = true;
 
     if (queryAttribution) {
         query.attribution = { $regex: queryAttribution, $options: 'i'};
