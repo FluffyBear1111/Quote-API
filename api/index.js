@@ -1,17 +1,18 @@
-const { limiter, generateRandomIndex, parseQueryTags, parseAttribution } = require('./utils');
-const { connectToDB, getDB } = require("./database-connection");
+require('dotenv').config();
+
+const { limiter, generateRandomIndex, parseQueryTags, parseAttribution } = require('../utils');
+const { connectToDB, getDB } = require("../database-connection");
 const express = require('express');
 const app = express();
-require('dotenv').config();
 let db;
 
 
-const startServer = async () => {
+/* const startServer = async () => {
     try 
     {
         await connectToDB();
         db = getDB();
-        const port = process.env.PORT || 3000;
+        const port = process.env.PORT || 8080;
         app.listen(port, () => console.log(`Listening on Port ${port}`))
     }
     catch (error) 
@@ -21,12 +22,23 @@ const startServer = async () => {
     }
   }
 
-startServer();  
+startServer();  */
+
 
 // Middleware
 app.use(limiter);
 app.use(express.json());
-
+app.use(async (req, res, next) => {
+    if (!db) {
+        try {
+            await connectToDB();
+            db = getDB();
+        } catch (error) {
+            return res.status(500).send({ message: "Database connection failed" });
+        }
+    }
+    next();
+});
 
 // Endpoints 
 app.get('/quote-by-id/:ID', async (req, res) => {
@@ -108,3 +120,4 @@ app.get('/quote-devChoice', async (req, res) => {
     }
 })
 
+module.exports = app;
