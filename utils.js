@@ -4,7 +4,8 @@ const limiter = rateLimit({
     max: 50,
     message: {
         message: "Too many requests, try again later."
-    }
+    },
+    validate: { xForwardedForHeader: false },
 })
 
 const generateRandomIndex = (arrayLength) => Math.floor(Math.random() * arrayLength);
@@ -25,3 +26,19 @@ const parseAttribution = (attribution) => {
 
 module.exports = { limiter, generateRandomIndex, parseQueryTags, parseAttribution };
 
+/* const startServer = async () => {
+    try 
+    {
+        await connectToDB();
+        db = getDB();
+        const port = process.env.PORT || 8080;
+        app.listen(port, () => console.log(`Listening on Port ${port}`))
+    }
+    catch (error) 
+    {
+        console.error('Failed to start: ', error);
+        process.exit(1);
+    }
+  }
+
+startServer();  */

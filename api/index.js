@@ -7,23 +7,6 @@ const app = express();
 let db;
 
 
-/* const startServer = async () => {
-    try 
-    {
-        await connectToDB();
-        db = getDB();
-        const port = process.env.PORT || 8080;
-        app.listen(port, () => console.log(`Listening on Port ${port}`))
-    }
-    catch (error) 
-    {
-        console.error('Failed to start: ', error);
-        process.exit(1);
-    }
-  }
-
-startServer();  */
-
 
 // Middleware
 app.use(limiter);
@@ -33,7 +16,8 @@ app.use(async (req, res, next) => {
         try {
             await connectToDB();
             db = getDB();
-        } catch (error) {
+        } 
+        catch (error) {
             return res.status(500).send({ message: "Database connection failed" });
         }
     }
